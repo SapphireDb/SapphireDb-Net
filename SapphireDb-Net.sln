@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SapphireDb-Net", "SapphireDb-Net\SapphireDb-Net.csproj", "{10C215A2-EA4C-4B9D-A37D-A2BF367E7644}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SapphireDbNetDemo", "SapphireDbNetDemo\SapphireDbNetDemo.csproj", "{6F4DC143-4CA0-4BB5-9B1A-4ABE54F33002}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{10C215A2-EA4C-4B9D-A37D-A2BF367E7644}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10C215A2-EA4C-4B9D-A37D-A2BF367E7644}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10C215A2-EA4C-4B9D-A37D-A2BF367E7644}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10C215A2-EA4C-4B9D-A37D-A2BF367E7644}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F4DC143-4CA0-4BB5-9B1A-4ABE54F33002}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F4DC143-4CA0-4BB5-9B1A-4ABE54F33002}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F4DC143-4CA0-4BB5-9B1A-4ABE54F33002}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F4DC143-4CA0-4BB5-9B1A-4ABE54F33002}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
