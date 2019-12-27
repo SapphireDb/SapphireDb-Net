@@ -10,7 +10,11 @@
         <e p="Command" t="Include" />
         <e p="Connection" t="Include">
           <e p="ConnectionBase.cs" t="Include" />
+          <e p="ConnectionManager.cs" t="Include" />
           <e p="WebsocketConnection.cs" t="Include" />
+        </e>
+        <e p="Helper" t="Include">
+          <e p="WebsocketHelper.cs" t="Include" />
         </e>
         <e p="obj" t="ExcludeRecursive">
           <e p="Debug" t="Include">

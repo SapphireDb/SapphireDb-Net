@@ -6,10 +6,10 @@ namespace SapphireDb_Net.Connection
 {
     public abstract class ConnectionBase
     {
-        protected ConnectionBase(SapphireDbOptions options,  String bearer)
+        protected ConnectionBase(SapphireDbOptions options,  String authToken)
         {
             Options = options;
-            Bearer = bearer;
+            AuthToken = authToken;
         }
         
         public Action<object> ConnectionResponseHandler;
@@ -19,7 +19,7 @@ namespace SapphireDb_Net.Connection
         public BehaviorSubject<ConnectionState> ReadyState = new BehaviorSubject<ConnectionState>(ConnectionState.Disconnected);
 
         public SapphireDbOptions Options;
-        public string Bearer;
+        public string AuthToken;
 
         public abstract void Send(object command, bool storedCommand);
         

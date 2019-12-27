@@ -1,4 +1,6 @@
 ﻿using System;
+using SapphireDb_Net.Connection;
+using SapphireDb_Net.Options;
 
 namespace SapphireDbNetDemo
 {
@@ -6,7 +8,16 @@ namespace SapphireDbNetDemo
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            WebsocketConnection c = new WebsocketConnection(new SapphireDbOptions()
+            {
+                ServerBaseUrl = "localhost:5000",
+                UseSsl = false,
+                ApiKey = "net_client",
+                ApiSecret = "pw1234"
+            }, null);
+            c.Send("Test", false);
+
+            Console.ReadKey();
         }
     }
 }
