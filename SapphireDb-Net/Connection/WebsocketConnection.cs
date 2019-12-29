@@ -1,17 +1,19 @@
 ﻿using System;
-using System.Net.WebSockets;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using SapphireDb_Net.Helper;
 using SapphireDb_Net.Options;
+using Websocket.Client;
 
 namespace SapphireDb_Net.Connection
 {
     public class WebsocketConnection : ConnectionBase
     {
-        private ClientWebSocket _webSocket;
+        private ManualResetEvent exitEvent = new ManualResetEvent(false);
+        private WebsocketClient _websocketClient;
+        // private ClientWebSocket _webSocket;
         
         public WebsocketConnection(SapphireDbOptions options, string authToken) : base(options, authToken)
         {
@@ -19,42 +21,39 @@ namespace SapphireDb_Net.Connection
 
         private IObservable<ConnectionState> Connect()
         {
-            ReadyState.Take(1).Subscribe(async (state) =>
+            Task.Run(() =>
             {
-                if (state == ConnectionState.Disconnected)
+                ReadyState.Take(1).Subscribe(async (state) =>
                 {
-                    ReadyState.OnNext(ConnectionState.Connecting);
-                    string connectionString = CreateConnectionString();
-                    
-                    _webSocket = new ClientWebSocket();
-
-                    _ = Task.Run(async () =>
+                    if (state == ConnectionState.Disconnected)
                     {
-                        while (_webSocket.State == WebSocketState.Open || _webSocket.State == WebSocketState.Connecting)
-                        {
-                            try
-                            {
-                                string message = await _webSocket.Receive();
+                        ReadyState.OnNext(ConnectionState.Connecting);
+                        Uri url = new Uri(CreateConnectionString());
 
-                                if (!string.IsNullOrEmpty(message))
-                                {
-                                    Console.WriteLine(message);
-                                }
-                            }
-                            catch (Exception ex)
+                        using (_websocketClient = new WebsocketClient(url))
+                        {
+                            _websocketClient.ReconnectTimeout = TimeSpan.FromSeconds(30);
+
+                            _websocketClient.DisconnectionHappened.Subscribe((info) =>
                             {
                                 ReadyState.OnNext(ConnectionState.Disconnected);
-                                
-                                Thread.Sleep(1000);
-                                Connect();
-                            }
+                            });
+                        
+                            _websocketClient.ReconnectionHappened.Subscribe((info) =>
+                            {
+                                ReadyState.OnNext(ConnectionState.Connected);
+                            });
+                        
+                            _websocketClient.MessageReceived.Subscribe(message =>
+                            {
+                                Console.WriteLine(message);
+                            });
+
+                            _ = _websocketClient.Start();
+                            exitEvent.WaitOne();
                         }
-
-                    });
-                    
-                    await _webSocket.ConnectAsync(new Uri(connectionString), CancellationToken.None);
-
-                }
+                    }
+                });
             });
 
             return ReadyState.AsObservable();
@@ -68,20 +67,21 @@ namespace SapphireDb_Net.Connection
 
             Connect()
                 .TakeWhile(state => state != ConnectionState.Disconnected || !storedCommand)
-                .Where(state => state == ConnectionState.Connected && _webSocket.State == WebSocketState.Open)
+                .Where(state => state == ConnectionState.Connected && _websocketClient.IsRunning)
                 .Take(1)
                 .Subscribe((state) =>
                 {
-                    _ = _webSocket.Send(command.ToString());
+                    _websocketClient.Send(command.ToString());
                 });
         }
 
         public override void DataUpdated()
         {
-            if (_webSocket != null && (_webSocket.State == WebSocketState.Open || _webSocket.State == WebSocketState.Connecting))
-            {
-                _webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Data updated", CancellationToken.None);
-            }
+            exitEvent.Set();
+            // if (_webSocket != null && (_webSocket.State == WebSocketState.Open || _webSocket.State == WebSocketState.Connecting))
+            // {
+            //     _webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Data updated", CancellationToken.None);
+            // }
         }
         
         private string CreateConnectionString()
