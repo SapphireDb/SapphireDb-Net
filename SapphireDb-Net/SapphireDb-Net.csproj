@@ -11,8 +11,4 @@
       <PackageReference Include="Websocket.Client" Version="4.1.76" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Command" />
-    </ItemGroup>
-
 </Project>

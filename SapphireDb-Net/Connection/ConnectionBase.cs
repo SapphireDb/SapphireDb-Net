@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Reactive.Subjects;
+using SapphireDb_Net.Command;
+using SapphireDb_Net.Command.Connection;
 using SapphireDb_Net.Options;
 
 namespace SapphireDb_Net.Connection
@@ -12,16 +14,16 @@ namespace SapphireDb_Net.Connection
             AuthToken = authToken;
         }
         
-        public Action<object> ConnectionResponseHandler;
+        public Action<ConnectionResponse> ConnectionResponseHandler;
         public Action OpenHandler;
-        public Action<object> MessageHandler;
+        public Action<ResponseBase> MessageHandler;
         
         public BehaviorSubject<ConnectionState> ReadyState = new BehaviorSubject<ConnectionState>(ConnectionState.Disconnected);
 
         public SapphireDbOptions Options;
         public string AuthToken;
 
-        public abstract void Send(object command, bool storedCommand);
+        public abstract void Send(CommandBase command, bool storedCommand);
         
         public abstract void DataUpdated();
     }

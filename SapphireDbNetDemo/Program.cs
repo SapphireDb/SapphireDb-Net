@@ -15,7 +15,7 @@ namespace SapphireDbNetDemo
                 ApiKey = "net_client",
                 ApiSecret = "pw1234"
             }, null);
-            c.Send("Test", false);
+            c.Send(null, false);
 
             Console.ReadKey();
         }
