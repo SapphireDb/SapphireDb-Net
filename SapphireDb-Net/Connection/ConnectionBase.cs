@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using SapphireDb_Net.Command;
 using SapphireDb_Net.Command.Connection;
@@ -8,28 +9,32 @@ namespace SapphireDb_Net.Connection
 {
     public abstract class ConnectionBase
     {
-        protected ConnectionBase(SapphireDbOptions options,  String authToken)
-        {
-            Options = options;
-            AuthToken = authToken;
-        }
-        
-        public Action<ConnectionResponse> ConnectionResponseHandler;
-        public Action OpenHandler;
         public Action<ResponseBase> MessageHandler;
         
-        public BehaviorSubject<ConnectionState> ReadyState = new BehaviorSubject<ConnectionState>(ConnectionState.Disconnected);
-
-        public SapphireDbOptions Options;
-        public string AuthToken;
+        public readonly BehaviorSubject<ConnectionInformation> ConnectionInformation =
+            new BehaviorSubject<ConnectionInformation>(new ConnectionInformation());
 
         public abstract void Send(CommandBase command, bool storedCommand);
-        
-        public abstract void DataUpdated();
+        public abstract void SetData(SapphireDbOptions options, string authToken = null);
+
+        public void UpdateConnectionInformation(ConnectionState readyState, Guid connectionId)
+        {
+            ConnectionInformation connectionInformation = ConnectionInformation.Value;
+            connectionInformation.ReadyState = readyState;
+            connectionInformation.ConnectionId = connectionId;
+            ConnectionInformation.OnNext(connectionInformation);
+        }
     }
 
     public enum ConnectionState
     {
         Disconnected, Connecting, Connected
+    }
+    
+    public class ConnectionInformation
+    {
+        public ConnectionState ReadyState { get; set; }
+
+        public Guid ConnectionId { get; set; }
     }
 }

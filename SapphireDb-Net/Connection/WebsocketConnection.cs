@@ -13,23 +13,22 @@ namespace SapphireDb_Net.Connection
 {
     public class WebsocketConnection : ConnectionBase
     {
+        private string _socketConnectionString;
+        
         private readonly ManualResetEvent _exitEvent = new ManualResetEvent(false);
         private WebsocketClient _websocketClient;
 
-        public WebsocketConnection(SapphireDbOptions options, string authToken) : base(options, authToken)
-        {
-        }
-
-        private IObservable<ConnectionState> Connect()
+        private void Connect()
         {
             Task.Run(() =>
             {
-                ReadyState.Take(1).Subscribe(async (state) =>
+                ConnectionInformation.Take(1).Subscribe(async (connectionInfo) =>
                 {
-                    if (state == ConnectionState.Disconnected)
+                    if (connectionInfo.ReadyState == ConnectionState.Disconnected)
                     {
-                        ReadyState.OnNext(ConnectionState.Connecting);
-                        Uri url = new Uri(CreateConnectionString());
+                        UpdateConnectionInformation(ConnectionState.Connecting, Guid.Empty);
+
+                        Uri url = new Uri(_socketConnectionString);
 
                         using (_websocketClient = new WebsocketClient(url))
                         {
@@ -37,7 +36,7 @@ namespace SapphireDb_Net.Connection
 
                             _websocketClient.DisconnectionHappened.Subscribe((info) =>
                             {
-                                ReadyState.OnNext(ConnectionState.Disconnected);
+                                UpdateConnectionInformation(ConnectionState.Disconnected, Guid.Empty);
                                 Thread.Sleep(1000);
                                 Connect();
                             });
@@ -48,13 +47,11 @@ namespace SapphireDb_Net.Connection
 
                                 if (response is ConnectionResponse connectionResponse)
                                 {
-                                    // ConnectionResponseHandler(connectionResponse);
-                                    ReadyState.OnNext(ConnectionState.Connected);
-                                    // OpenHandler();
+                                    UpdateConnectionInformation(ConnectionState.Connected, Guid.Empty);
                                 }
                                 else
                                 {
-                                    // MessageHandler(response);
+                                    // MessageHandler(response); // TODO
                                 }
                                 Console.WriteLine(message);
                             });
@@ -65,19 +62,13 @@ namespace SapphireDb_Net.Connection
                     }
                 });
             });
-
-            return ReadyState.AsObservable();
         }
         
         public override void Send(CommandBase command, bool storedCommand)
         {
-            if (storedCommand && ReadyState.Value != ConnectionState.Connected) {
-                return;
-            }
-            
-            Connect()
-                .TakeWhile(state => state != ConnectionState.Disconnected || !storedCommand)
-                .Where(state => state == ConnectionState.Connected && _websocketClient.IsRunning)
+            ConnectionInformation
+                .TakeWhile(connectionInformation => connectionInformation.ReadyState != ConnectionState.Disconnected || !storedCommand)
+                .Where(connectionInformation => connectionInformation.ReadyState == ConnectionState.Connected)
                 .Take(1)
                 .Subscribe((state) =>
                 {
@@ -85,32 +76,38 @@ namespace SapphireDb_Net.Connection
                 });
         }
 
-        public override void DataUpdated()
+        public override void SetData(SapphireDbOptions options, string authToken = null)
         {
             Task.Run(async () =>
             {
-                if (_websocketClient != null)
+                CreateConnectionString(options, authToken);
+                
+                if (_websocketClient == null)
                 {
-                    _websocketClient.Url = new Uri(CreateConnectionString());
+                    Connect();
+                }
+                else
+                {
+                    _websocketClient.Url = new Uri(_socketConnectionString);
                     await _websocketClient.Reconnect();   
                 }
             });
         }
         
-        private string CreateConnectionString()
+        private void CreateConnectionString(SapphireDbOptions options, string authToken = null)
         {
-            string urlPrefix = Options.UseSsl ? "wss" : "ws";
-            string url = $"{urlPrefix}://{Options.ServerBaseUrl}/sapphire/socket?";
+            string urlPrefix = options.UseSsl ? "wss" : "ws";
+            string url = $"{urlPrefix}://{options.ServerBaseUrl}/sapphire/socket?";
 
-            if (!string.IsNullOrEmpty(Options.ApiSecret) && !string.IsNullOrEmpty(Options.ApiKey)) {
-                url += $"key={Options.ApiKey}&secret={Options.ApiSecret}&";
+            if (!string.IsNullOrEmpty(options.ApiSecret) && !string.IsNullOrEmpty(options.ApiKey)) {
+                url += $"key={options.ApiKey}&secret={options.ApiSecret}&";
             }
             
-            if (!string.IsNullOrEmpty(AuthToken)) {
-                url += $"bearer={AuthToken}";
+            if (!string.IsNullOrEmpty(authToken)) {
+                url += $"bearer={authToken}";
             }
 
-            return url;
+            _socketConnectionString = url;
         }
     }
 }

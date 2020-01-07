@@ -8,14 +8,15 @@ namespace SapphireDbNetDemo
     {
         static void Main(string[] args)
         {
-            WebsocketConnection c = new WebsocketConnection(new SapphireDbOptions()
+            SapphireDbOptions options = new SapphireDbOptions()
             {
                 ServerBaseUrl = "localhost:5000",
                 UseSsl = false,
                 ApiKey = "net_client",
                 ApiSecret = "pw1234"
-            }, null);
-            c.Send(null, false);
+            };
+            ConnectionManager c = new ConnectionManager(options);
+            c.SendCommand(null);
 
             Console.ReadKey();
         }
