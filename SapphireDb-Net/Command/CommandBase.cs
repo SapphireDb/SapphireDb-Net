@@ -8,9 +8,9 @@ namespace SapphireDb_Net.Command
 
         public Guid ReferenceId { get; set; }
 
-        public CommandBase(string commandType)
+        public CommandBase()
         {
-            CommandType = commandType;
+            CommandType = GetType().Name;
             ReferenceId = Guid.NewGuid();
         }
     }

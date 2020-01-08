@@ -51,7 +51,7 @@ namespace SapphireDb_Net.Connection
                                 }
                                 else
                                 {
-                                    // MessageHandler(response); // TODO
+                                    MessageHandler(response);
                                 }
                                 Console.WriteLine(message);
                             });

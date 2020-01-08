@@ -1,21 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ContentModelStore">
-    <e p="C:\Users\morri\.Rider2019.3\config\consoles\db" t="IncludeRecursive" />
-    <e p="C:\Users\morri\.Rider2019.3\config\extensions" t="IncludeRecursive" />
-    <e p="C:\Users\morri\.Rider2019.3\config\scratches" t="IncludeRecursive" />
-    <e p="C:\Users\morri\.Rider2019.3\system\extResources" t="IncludeRecursive" />
-    <e p="C:\Users\morri\.Rider2019.3\system\resharper-host\local\Transient\ReSharperHost\v193\SolutionCaches\_SapphireDb-Net.752864727.00" t="ExcludeRecursive" />
-    <e p="C:\Users\morri\Documents\Projects\productive\SapphireDb\SapphireDb-Net" t="IncludeFlat">
+    <e p="C:\Users\mjanatzek\.Rider2019.3\system\extResources" t="IncludeRecursive" />
+    <e p="C:\Users\mjanatzek\.Rider2019.3\system\resharper-host\local\Transient\ReSharperHost\v193\SolutionCaches\_SapphireDb-Net.112618111.00" t="ExcludeRecursive" />
+    <e p="C:\Users\mjanatzek\Documents\Projects\private\SapphireDb\SapphireDb-Net" t="IncludeFlat">
       <e p="packages" t="ExcludeRecursive" />
       <e p="SapphireDb-Net" t="IncludeRecursive">
         <e p="bin" t="ExcludeRecursive" />
+        <e p="Collection" t="Include">
+          <e p="CollectionBase.cs" t="Include" />
+          <e p="CollectionInformationManager.cs" t="Include" />
+          <e p="CollectionManager.cs" t="Include" />
+          <e p="Prefilter" t="Include">
+            <e p="AfterQueryPrefilterBase.cs" t="Include" />
+            <e p="IPrefilter.cs" t="Include" />
+            <e p="PrefilterBase.cs" t="Include" />
+            <e p="WherePrefilter.cs" t="Include" />
+          </e>
+        </e>
         <e p="Command" t="Include">
+          <e p="CollectionCommandBase.cs" t="Include" />
           <e p="CommandBase.cs" t="Include" />
           <e p="Connection" t="Include">
             <e p="ConnectionResponse.cs" t="Include" />
+            <e p="WrongApiResponse.cs" t="Include" />
+          </e>
+          <e p="Info" t="Include">
+            <e p="InfoCommand.cs" t="Include" />
+            <e p="InfoResponse.cs" t="Include" />
+          </e>
+          <e p="Query" t="Include">
+            <e p="QueryCommand.cs" t="Include" />
+            <e p="QueryResponse.cs" t="Include" />
           </e>
           <e p="ResponseBase.cs" t="Include" />
+          <e p="Subscribe" t="Include">
+            <e p="ChangeResponse.cs" t="Include" />
+            <e p="SubscribeCommand.cs" t="Include" />
+          </e>
+          <e p="Unsubscribe" t="Include">
+            <e p="UnsubscribeCommand.cs" t="Include" />
+          </e>
         </e>
         <e p="Connection" t="Include">
           <e p="ConnectionBase.cs" t="Include" />
@@ -26,6 +51,7 @@
           <e p="JsonHelper.cs" t="Include" />
         </e>
         <e p="Models" t="Include">
+          <e p="CommandReference.cs" t="Include" />
           <e p="SubscribeCommandInfo.cs" t="Include" />
         </e>
         <e p="obj" t="ExcludeRecursive">

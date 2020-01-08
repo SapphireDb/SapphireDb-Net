@@ -2,7 +2,7 @@
 
 namespace SapphireDb_Net.Models
 {
-    public class SubscribeCommandInfo
+    class SubscribeCommandInfo
     {
         public CommandBase Command { get; set; }
 

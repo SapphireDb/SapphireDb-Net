@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using SapphireDb_Net.Collection.Prefilter;
+using SapphireDb_Net.Command.Subscribe;
 using SapphireDb_Net.Connection;
 using SapphireDb_Net.Options;
 
@@ -16,7 +19,7 @@ namespace SapphireDbNetDemo
                 ApiSecret = "pw1234"
             };
             ConnectionManager c = new ConnectionManager(options);
-            c.SendCommand(null);
+            c.SendCommand(new SubscribeCommand("entries", "demo", new List<IPrefilter>()));
 
             Console.ReadKey();
         }
