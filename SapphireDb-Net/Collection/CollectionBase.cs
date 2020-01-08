@@ -1,11 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reactive.Linq;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SapphireDb_Net.Collection.Prefilter;
 using SapphireDb_Net.Command;
+using SapphireDb_Net.Command.Info;
 using SapphireDb_Net.Command.Query;
+using SapphireDb_Net.Command.Subscribe;
+using SapphireDb_Net.Command.Unsubscribe;
 using SapphireDb_Net.Connection;
+using SapphireDb_Net.Helper;
+using SapphireDb_Net.Models;
 
 namespace SapphireDb_Net.Collection
 {
@@ -13,45 +19,90 @@ namespace SapphireDb_Net.Collection
     {
         private readonly ConnectionManager _connectionManager;
         private readonly CollectionManager _collectionManager;
-        
-        public List<IPrefilter> Prefilters = new List<IPrefilter>();
-        public string CollectionName;
-        public string ContextName;
+        private readonly IObservable<InfoResponse> _collectionInformation;
+        private readonly string _contextName;
+        private readonly string _collectionName;
 
-        public CollectionBase(string collectionNameRaw, ConnectionManager connectionManager, CollectionManager collectionManager)
+        protected readonly List<IPrefilter> _prefilters;
+
+
+        public CollectionBase(string collectionNameRaw, ConnectionManager connectionManager,
+            CollectionManager collectionManager, List<IPrefilter> prefilters,
+            IObservable<InfoResponse> collectionInformation)
         {
             _connectionManager = connectionManager;
             _collectionManager = collectionManager;
-            string[] collectionNameParts = collectionNameRaw.Split('.');
+            _collectionInformation = collectionInformation;
+            
+            _prefilters = prefilters;
 
-            CollectionName = collectionNameParts.Length == 1 ? collectionNameParts[0] : collectionNameParts[1];
-            ContextName = collectionNameParts.Length == 2 ? collectionNameParts[0] : "default";
+            Tuple<string, string> collectionNameParsed = collectionNameRaw.ParseCollectionName();
+            _collectionName = collectionNameParsed.Item1;
+            _contextName = collectionNameParsed.Item2;
         }
-        
-        public IObservable<TValue> Snapshot() {
-            QueryCommand queryCommand = new QueryCommand(CollectionName, ContextName, Prefilters);
+
+        public IObservable<TValue> Snapshot()
+        {
+            QueryCommand queryCommand = new QueryCommand(_collectionName, _contextName, _prefilters);
 
             return _connectionManager.SendCommand(queryCommand)
                 .Select(response =>
                 {
                     if (response is QueryResponse queryResponse)
                     {
-                        Type valueType = typeof(TValue);
-                        
-                        if (valueType.IsArray)
-                        {
-                            valueType = valueType.GetElementType();
-                            return (TValue)queryResponse.Result.Values(valueType);
-                        }
-                        else
-                        {
-                            return queryResponse.Result.Value<TValue>();
-                        }
+                        return queryResponse.Result.ToObject<TValue>();
                     }
 
                     return default(TValue);
                 });
-            
+        }
+
+        public IObservable<TValue> Values()
+        {
+            CollectionValue collectionValue = CreateValuesSubscription();
+            return CreateCollectionObservable(collectionValue);
+        }
+
+        private CollectionValue CreateValuesSubscription()
+        {
+            SubscribeCommand subscribeCommand = new SubscribeCommand(_collectionName, _contextName, _prefilters);
+            CollectionValue collectionValue = new CollectionValue(subscribeCommand.ReferenceId);
+
+            collectionValue.SocketSubscription = _connectionManager.SendCommand(subscribeCommand, true)
+                .Subscribe((response) =>
+                {
+                    if (response is QueryResponse queryResponse)
+                    {
+                        collectionValue.Subject.OnNext(queryResponse.Result.ToObject<TValue>());
+                    }
+                    else if (response is ChangeResponse changeResponse)
+                    {
+                        // TODO: Handle update
+                    }
+                }, (error) =>
+                {
+                    collectionValue.Subject.OnError(error);
+                });
+
+            return collectionValue;
+        }
+
+        private IObservable<TValue> CreateCollectionObservable(CollectionValue collectionValue)
+        {
+            return collectionValue.Subject
+                .Finally(() =>
+                {
+                    _connectionManager.SendCommand(new UnsubscribeCommand(_collectionName, _contextName,
+                        collectionValue.ReferenceId));
+                    collectionValue.SocketSubscription.Dispose();
+                })
+                .Select((values) =>
+                {
+                    return (TValue)values;
+                })
+                .Publish()
+                .Replay()
+                .RefCount();
         }
     }
 }

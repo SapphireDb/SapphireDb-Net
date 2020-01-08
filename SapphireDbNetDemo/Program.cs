@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using SapphireDb_Net;
 using SapphireDb_Net.Collection.Prefilter;
 using SapphireDb_Net.Command.Subscribe;
 using SapphireDb_Net.Connection;
@@ -18,8 +19,12 @@ namespace SapphireDbNetDemo
                 ApiKey = "net_client",
                 ApiSecret = "pw1234"
             };
-            ConnectionManager c = new ConnectionManager(options);
-            c.SendCommand(new SubscribeCommand("entries", "demo", new List<IPrefilter>()));
+            SapphireDb db = new SapphireDb(options);
+
+            db.Collection<object>("demo.entries").Snapshot().Subscribe((value) =>
+            {
+                
+            });
 
             Console.ReadKey();
         }
