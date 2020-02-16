@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reactive.Linq;
 using SapphireDb_Net;
+using SapphireDb_Net.Collection;
 using SapphireDb_Net.Collection.Prefilter;
 using SapphireDb_Net.Command.Subscribe;
 using SapphireDb_Net.Connection;
@@ -21,11 +25,20 @@ namespace SapphireDbNetDemo
             };
             SapphireDb db = new SapphireDb(options);
 
-            db.Collection<object>("demo.entries").Snapshot().Subscribe((value) =>
+            DefaultCollection<object> collection = db.Collection<object>("demo.entries");
+            
+            collection.Values().Subscribe((value) =>
             {
                 
             });
 
+            collection.Add(new {content = "Das ist ein test"}, new { content = "Das ist test 2" }).Subscribe((r) =>
+            {
+                
+            });
+
+            
+            
             Console.ReadKey();
         }
     }

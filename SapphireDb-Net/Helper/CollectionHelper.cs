@@ -11,8 +11,18 @@ namespace SapphireDb_Net.Helper
 {
     public static class CollectionHelper
     {
+        public static void CallUpdateCollection(
+            Type modelType,
+            ISubject<object> collectionDataSubject,
+            IObservable<InfoResponse> collectionInformation,
+            ChangeResponse changeResponse)
+        {
+            typeof(CollectionHelper).GetMethod(nameof(UpdateCollection))?.MakeGenericMethod(modelType).Invoke(null,
+                new object[] {collectionDataSubject, collectionInformation, changeResponse});
+        }
+        
         public static void UpdateCollection<T>(
-            ISubject<List<T>> collectionDataSubject,
+            ISubject<object> collectionDataSubject,
             IObservable<InfoResponse> collectionInformation,
             ChangeResponse changeResponse)
         {
@@ -20,7 +30,7 @@ namespace SapphireDb_Net.Helper
                 .Select((information) =>
                 {
                     return collectionDataSubject.Select((collectionData) =>
-                        new Tuple<InfoResponse, List<T>>(information, collectionData));
+                        new Tuple<InfoResponse, List<T>>(information, (List<T>)collectionData));
                 })
                 .Switch()
                 .Take(1)
@@ -33,7 +43,7 @@ namespace SapphireDb_Net.Helper
 
                     if (changeResponse.State == ChangeResponse.ChangeState.Added)
                     {
-                        values.Add(changeResponse.Value.ToObject<T>());
+                        values.Add(changeModel);
                         collectionDataSubject.OnNext(values);
                     }
                     else
@@ -44,27 +54,29 @@ namespace SapphireDb_Net.Helper
                                 primaryKey.Equals(pi.Name, StringComparison.InvariantCultureIgnoreCase)))
                             .ToList();
                         
+                        int index = values.FindIndex((value) =>
+                        {
+                            return primaryKeyProperties
+                                .All(property => property.GetValue(changeModel).Equals(property.GetValue(value)));
+                        });
+
+                        if (index == -1)
+                        {
+                            return;
+                        }
+                        
                         if (changeResponse.State == ChangeResponse.ChangeState.Modified)
                         {
-                            // TODO: Implement modified
+                            values.RemoveAt(index);
+                            values.Insert(index, changeModel);
                         }
                         else if (changeResponse.State == ChangeResponse.ChangeState.Deleted)
                         {
-                            int index = values.FindIndex((value) =>
-                            {
-                                return primaryKeyProperties
-                                    .All(property => property.GetValue(changeModel).Equals(property.GetValue(value)));
-                            });
-
-                            if (index != -1)
-                            {
-                                values.RemoveAt(index);
-                                collectionDataSubject.OnNext(values);
-                            }
+                            values.RemoveAt(index);
                         }
+                        
+                        collectionDataSubject.OnNext(values);
                     }
-                    
-                    
                 });
         }
     }

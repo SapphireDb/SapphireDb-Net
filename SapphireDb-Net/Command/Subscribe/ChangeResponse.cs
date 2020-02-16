@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 
 namespace SapphireDb_Net.Command.Subscribe
 {
@@ -12,5 +13,10 @@ namespace SapphireDb_Net.Command.Subscribe
         {
             Added, Deleted, Modified
         }
+    }
+
+    public class ChangesResponse : ResponseBase
+    {
+        public List<ChangeResponse> Changes { get; set; }
     }
 }

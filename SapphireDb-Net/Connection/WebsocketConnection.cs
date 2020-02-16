@@ -49,7 +49,7 @@ namespace SapphireDb_Net.Connection
                                 {
                                     UpdateConnectionInformation(ConnectionState.Connected, Guid.Empty);
                                 }
-                                else
+                                else if (response != null)
                                 {
                                     MessageHandler(response);
                                 }

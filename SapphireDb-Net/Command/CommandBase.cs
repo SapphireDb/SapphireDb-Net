@@ -10,7 +10,7 @@ namespace SapphireDb_Net.Command
 
         public CommandBase()
         {
-            CommandType = GetType().Name;
+            CommandType = GetType().Name.Split("`")[0];
             ReferenceId = Guid.NewGuid();
         }
     }

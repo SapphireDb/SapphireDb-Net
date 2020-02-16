@@ -6,6 +6,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using SapphireDb_Net.Command;
+using SapphireDb_Net.Command.Connection;
 using SapphireDb_Net.Command.Subscribe;
 using SapphireDb_Net.Command.Unsubscribe;
 using SapphireDb_Net.Models;
@@ -102,7 +103,7 @@ namespace SapphireDb_Net.Connection
 
         private void HandleResponse(ResponseBase response)
         {
-            if (response.ResponseType == "WrongApiResponse")
+            if (response is WrongApiResponse)
             {
                 throw new Exception("Wrong API key or secret");
             }
