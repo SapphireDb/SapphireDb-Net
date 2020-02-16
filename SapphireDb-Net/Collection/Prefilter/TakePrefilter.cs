@@ -1,0 +1,24 @@
+﻿using System.Collections.Generic;
+
+namespace SapphireDb_Net.Collection.Prefilter
+{
+    public class TakePrefilter<T> : PrefilterBase<T, List<T>>
+    {
+        public int Number { get; set; }
+
+        public TakePrefilter(int number)
+        {
+            Number = number;
+        }
+        
+        public override List<T> Execute(List<T> values)
+        {
+            return values;
+        }
+
+        public override string Hash()
+        {
+            return $"{PrefilterType},{Number}";
+        }
+    }
+}

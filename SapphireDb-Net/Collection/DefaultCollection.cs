@@ -14,5 +14,35 @@ namespace SapphireDb_Net.Collection
             collectionManager, prefilters, collectionInformation)
         {
         }
+        
+        /// <summary>
+        /// Skip a number of entries
+        /// </summary>
+        /// <param name="number">Number of entries to skip</param>
+        public DefaultCollection<T> Skip(int number)
+        {
+            return _collectionManager.GetCollection<T>($"{_contextName}.{_collectionName}", _prefilters,
+                new SkipPrefilter<T>(number));
+        }
+        
+        /// <summary>
+        /// Take a number of entries
+        /// </summary>
+        /// <param name="number">Number of entries to take</param>
+        public DefaultCollection<T> Take(int number)
+        {
+            return _collectionManager.GetCollection<T>($"{_contextName}.{_collectionName}", _prefilters,
+                new TakePrefilter<T>(number));
+        }
+        
+        /// <summary>
+        /// Filter the data to query
+        /// </summary>
+        /// <param name="conditions">The array of conditions for the filter operation</param>
+        public DefaultCollection<T> Where(object[] conditions)
+        {
+            return _collectionManager.GetCollection<T>($"{_contextName}.{_collectionName}", _prefilters,
+                new WherePrefilter<T>(conditions));
+        }
     }
 }

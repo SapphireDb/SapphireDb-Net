@@ -26,16 +26,18 @@ namespace SapphireDbNetDemo
             SapphireDb db = new SapphireDb(options);
 
             DefaultCollection<object> collection = db.Collection<object>("demo.entries");
+
+            IObservable<List<object>> values = collection.Where(new object[] { "content", "==", "xyc" }).Values();
             
-            collection.Values().Subscribe((value) =>
+            values.Subscribe((value) =>
             {
                 
             });
 
-            collection.Add(new {content = "Das ist ein test"}, new { content = "Das ist test 2" }).Subscribe((r) =>
-            {
-                
-            });
+            // collection.Add(new {content = "Das ist ein test"}, new { content = "Das ist test 2" }).Subscribe((r) =>
+            // {
+            //     
+            // });
 
             
             

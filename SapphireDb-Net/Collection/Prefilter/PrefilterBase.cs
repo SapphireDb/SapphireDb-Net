@@ -8,7 +8,7 @@ namespace SapphireDb_Net.Collection.Prefilter
 
         public PrefilterBase()
         {
-            PrefilterType = GetType().Name;
+            PrefilterType = GetType().Name.Split("`")[0];
         }
 
         public abstract TOutput Execute(List<TInput> values);

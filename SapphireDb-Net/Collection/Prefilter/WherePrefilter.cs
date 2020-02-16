@@ -5,7 +5,12 @@ namespace SapphireDb_Net.Collection.Prefilter
 {
     public class WherePrefilter<T> : PrefilterBase<T, List<T>>
     {
-        public object Conditions { get; set; }
+        public object[] Conditions { get; set; }
+
+        public WherePrefilter(object[] conditions)
+        {
+            Conditions = conditions;
+        }
         
         public override List<T> Execute(List<T> values)
         {

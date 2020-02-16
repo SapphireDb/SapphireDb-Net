@@ -39,7 +39,7 @@ namespace SapphireDb_Net.Collection
 
             // }
 
-            return new DefaultCollection<T>(collectionNameRaw, _connectionManager, this, prefilters,
+            return new DefaultCollection<T>(collectionNameRaw, _connectionManager, this, newPrefilters,
                 _collectionInformationManager.GetCollectionInformation(collectionNameRaw));
         }
     }

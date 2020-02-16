@@ -25,14 +25,14 @@ namespace SapphireDb_Net.Collection
             string collectionName = collectionNameParsed.Item1;
             string contextName = collectionNameParsed.Item2;
 
-            if (_collectionInformation.TryGetValue($"{contextName}:{collectionName}",
+            if (_collectionInformation.TryGetValue($"{contextName}.{collectionName}",
                 out IObservable<InfoResponse> infoResponse))
             {
                 return infoResponse.Take(1);
             }
 
             ReplaySubject<InfoResponse> subject = new ReplaySubject<InfoResponse>(1);
-            _collectionInformation.TryAdd($"{contextName}:{collectionName}", subject);
+            _collectionInformation.TryAdd($"{contextName}.{collectionName}", subject);
 
             _connectionManager.SendCommand(new InfoCommand(collectionName, contextName))
                 .Subscribe(response =>
