@@ -158,8 +158,8 @@ namespace SapphireDb_Net.Collection
             CollectionValue collectionValue = new CollectionValue(subscribeCommand.ReferenceId);
 
             Type modelType = null;
-            
-            if (typeof(T).GetGenericTypeDefinition() == typeof(List<>))
+
+            if (typeof(T).IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(List<>))
             {
                 modelType = typeof(T).GetGenericArguments().FirstOrDefault();
             }
@@ -201,8 +201,13 @@ namespace SapphireDb_Net.Collection
                     {
                         result = prefilter.Execute(result);
                     }
-                    
-                    return (TValue)(object)(new List<TModel>(result));
+
+                    if (typeof(TValue).IsGenericType && typeof(TValue).GetGenericTypeDefinition() == typeof(List<>))
+                    {
+                        return (TValue)(object)(new List<TModel>(result));
+                    }
+
+                    return (TValue)result;
                 })
                 .Finally(() =>
                 {

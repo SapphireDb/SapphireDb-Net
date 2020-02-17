@@ -3,7 +3,7 @@ using SapphireDb_Net.Helper;
 
 namespace SapphireDb_Net.Collection.Prefilter
 {
-    public class WherePrefilter<T> : PrefilterBase<T, List<T>>
+    public class WherePrefilter<T> : PrefilterBase<T, IEnumerable<T>>
     {
         public object[] Conditions { get; set; }
 
@@ -12,7 +12,7 @@ namespace SapphireDb_Net.Collection.Prefilter
             Conditions = conditions;
         }
         
-        public override List<T> Execute(List<T> values)
+        public override IEnumerable<T> Execute(IEnumerable<T> values)
         {
             return values;
         }

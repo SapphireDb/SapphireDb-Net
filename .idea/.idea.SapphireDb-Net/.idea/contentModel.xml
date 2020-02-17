@@ -18,14 +18,21 @@
           <e p="OrderedCollection.cs" t="Include" />
           <e p="Prefilter" t="Include">
             <e p="AfterQueryPrefilterBase.cs" t="Include" />
+            <e p="CountPrefilter.cs" t="Include" />
+            <e p="FirstPrefilter.cs" t="Include" />
             <e p="IAfterQueryPrefilter.cs" t="Include" />
+            <e p="IncludePrefilter.cs" t="Include" />
             <e p="IPrefilter.cs" t="Include" />
+            <e p="LastPrefilter.cs" t="Include" />
             <e p="OrderByPrefilter.cs" t="Include" />
             <e p="PrefilterBase.cs" t="Include" />
+            <e p="SelectPrefilter.cs" t="Include" />
             <e p="SkipPrefilter.cs" t="Include" />
             <e p="TakePrefilter.cs" t="Include" />
+            <e p="ThenOrderByPrefilter.cs" t="Include" />
             <e p="WherePrefilter.cs" t="Include" />
           </e>
+          <e p="ReducedCollection.cs" t="Include" />
         </e>
         <e p="Command" t="Include">
           <e p="CollectionCommandBase.cs" t="Include" />
@@ -117,6 +124,7 @@
         </e>
         <e p="Program.cs" t="Include" />
         <e p="SapphireDbNetDemo.csproj" t="IncludeRecursive" />
+        <e p="User.cs" t="Include" />
       </e>
     </e>
   </component>

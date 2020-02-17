@@ -19,7 +19,7 @@ namespace SapphireDb_Net.Collection
             _collectionInformationManager = collectionInformationManager;
         }
 
-        public dynamic GetCollection<T>(string collectionNameRaw, List<IPrefilter> prefilters,
+        public dynamic GetCollection<TModel, TValue>(string collectionNameRaw, List<IPrefilter> prefilters,
             IPrefilter newPrefilter = null)
         {
             List<IPrefilter> newPrefilters = prefilters.ToList();
@@ -29,18 +29,19 @@ namespace SapphireDb_Net.Collection
                 newPrefilters.Add(newPrefilter);
             }
 
-            // if (newPrefilter is IAfterQueryPrefilter)
-            // {
-
-            // }
-
-            if (newPrefilter is OrderByPrefilter<T>)
+            if (newPrefilter is IAfterQueryPrefilter)
             {
-                return new OrderedCollection<T>(collectionNameRaw, _connectionManager, this, newPrefilters,
+                return new ReducedCollection<TModel, TValue>(collectionNameRaw, _connectionManager, this, newPrefilters,
                     _collectionInformationManager.GetCollectionInformation(collectionNameRaw));
             }
 
-            return new DefaultCollection<T>(collectionNameRaw, _connectionManager, this, newPrefilters,
+            if (newPrefilter is OrderByPrefilter<TModel>)
+            {
+                return new OrderedCollection<TModel>(collectionNameRaw, _connectionManager, this, newPrefilters,
+                    _collectionInformationManager.GetCollectionInformation(collectionNameRaw));
+            }
+
+            return new DefaultCollection<TModel>(collectionNameRaw, _connectionManager, this, newPrefilters,
                 _collectionInformationManager.GetCollectionInformation(collectionNameRaw));
         }
     }

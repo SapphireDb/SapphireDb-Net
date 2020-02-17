@@ -11,7 +11,7 @@ namespace SapphireDb_Net.Collection.Prefilter
 
         public bool Descending { get; set; }
 
-        private readonly Func<T, object> _filterSelector; 
+        protected readonly Func<T, object> FilterSelector; 
         
         public OrderByPrefilter(string property, SortDirection direction = SortDirection.Ascending)
         {
@@ -20,17 +20,17 @@ namespace SapphireDb_Net.Collection.Prefilter
 
             PropertyInfo propertyInfo = typeof(T).GetProperty(property,
                 BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase);
-            _filterSelector = (value) => propertyInfo?.GetValue(value);
+            FilterSelector = (value) => propertyInfo?.GetValue(value);
         }
         
-        public override IOrderedEnumerable<T> Execute(List<T> values)
+        public override IOrderedEnumerable<T> Execute(IEnumerable<T> values)
         {
             if (Descending)
             {
-                return values.OrderByDescending(_filterSelector);
+                return values.OrderByDescending(FilterSelector);
             }
 
-            return values.OrderBy(_filterSelector);
+            return values.OrderBy(FilterSelector);
         }
 
         public override string Hash()

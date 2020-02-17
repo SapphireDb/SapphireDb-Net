@@ -22,7 +22,7 @@ namespace SapphireDb_Net
 
         public DefaultCollection<T> Collection<T>(string collectionName)
         {
-            return (DefaultCollection<T>)_collectionManager.GetCollection<T>(collectionName, new List<IPrefilter>(), null);
+            return (DefaultCollection<T>)_collectionManager.GetCollection<T, List<T>>(collectionName, new List<IPrefilter>(), null);
         }
     }
 }

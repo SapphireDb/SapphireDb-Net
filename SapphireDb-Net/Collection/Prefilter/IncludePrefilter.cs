@@ -2,10 +2,13 @@
 
 namespace SapphireDb_Net.Collection.Prefilter
 {
-    public class SkipPrefilter<T> : TakePrefilter<T>
+    public class IncludePrefilter<T> : PrefilterBase<T, IEnumerable<T>>
     {
-        public SkipPrefilter(int number) : base(number)
+        public string Include { get; set; }
+
+        public IncludePrefilter(string include)
         {
+            Include = include;
         }
         
         public override IEnumerable<T> Execute(IEnumerable<T> values)
@@ -15,7 +18,7 @@ namespace SapphireDb_Net.Collection.Prefilter
 
         public override string Hash()
         {
-            return $"{PrefilterType},{Number}";
+            return $"{PrefilterType},{Include}";
         }
     }
 }

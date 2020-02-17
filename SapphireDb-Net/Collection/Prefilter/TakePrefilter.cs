@@ -2,7 +2,7 @@
 
 namespace SapphireDb_Net.Collection.Prefilter
 {
-    public class TakePrefilter<T> : PrefilterBase<T, List<T>>
+    public class TakePrefilter<T> : PrefilterBase<T, IEnumerable<T>>
     {
         public int Number { get; set; }
 
@@ -11,7 +11,7 @@ namespace SapphireDb_Net.Collection.Prefilter
             Number = number;
         }
         
-        public override List<T> Execute(List<T> values)
+        public override IEnumerable<T> Execute(IEnumerable<T> values)
         {
             return values;
         }

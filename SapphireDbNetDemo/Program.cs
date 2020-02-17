@@ -26,21 +26,32 @@ namespace SapphireDbNetDemo
             SapphireDb db = new SapphireDb(options);
 
             DefaultCollection<Entry> collection = db.Collection<Entry>("demo.entries");
-
-            // IObservable<List<object>> values = collection.Where(new object[] { "content", "==", "xyc" }).Values();
-            IObservable<List<Entry>> values = collection.OrderBy("content", SortDirection.Descending).Values();
+            //
+            // IObservable<List<Entry>> values = collection.Where(new object[] { "content", "==", "xyc" }).Values();
+            // IObservable<List<Entry>> values = collection.OrderBy("content", SortDirection.Descending).ThenOrderBy("integerValue").Values();
             
-            values.Subscribe((value) =>
-            {
-                
-            });
+            // values.Subscribe((value) =>
+            // {
+            //     
+            // });
 
             // collection.Add(new {content = "Das ist ein test"}, new { content = "Das ist test 2" }).Subscribe((r) =>
             // {
             //     
             // });
 
-            
+
+            // DefaultCollection<User> userCollection = db.Collection<User>("demo.users").Include("entries");
+            //
+            // userCollection.Values().Subscribe(result =>
+            // {
+            //     
+            // });
+
+            collection.Select("content").Values().Subscribe(v =>
+            {
+                
+            });
             
             Console.ReadKey();
         }

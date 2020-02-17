@@ -21,7 +21,7 @@ namespace SapphireDb_Net.Collection
         /// <param name="number">Number of entries to skip</param>
         public DefaultCollection<T> Skip(int number)
         {
-            return _collectionManager.GetCollection<T>($"{_contextName}.{_collectionName}", _prefilters,
+            return _collectionManager.GetCollection<T, List<T>>($"{_contextName}.{_collectionName}", _prefilters,
                 new SkipPrefilter<T>(number));
         }
         
@@ -31,7 +31,7 @@ namespace SapphireDb_Net.Collection
         /// <param name="number">Number of entries to take</param>
         public DefaultCollection<T> Take(int number)
         {
-            return _collectionManager.GetCollection<T>($"{_contextName}.{_collectionName}", _prefilters,
+            return _collectionManager.GetCollection<T, List<T>>($"{_contextName}.{_collectionName}", _prefilters,
                 new TakePrefilter<T>(number));
         }
         
@@ -41,7 +41,7 @@ namespace SapphireDb_Net.Collection
         /// <param name="conditions">The array of conditions for the filter operation</param>
         public DefaultCollection<T> Where(object[] conditions)
         {
-            return _collectionManager.GetCollection<T>($"{_contextName}.{_collectionName}", _prefilters,
+            return _collectionManager.GetCollection<T, List<T>>($"{_contextName}.{_collectionName}", _prefilters,
                 new WherePrefilter<T>(conditions));
         }
         
@@ -53,8 +53,55 @@ namespace SapphireDb_Net.Collection
         /// <returns></returns>
         public OrderedCollection<T> OrderBy(string property, SortDirection direction = SortDirection.Ascending)
         {
-            return _collectionManager.GetCollection<T>($"{_contextName}.{_collectionName}", _prefilters,
+            return _collectionManager.GetCollection<T, List<T>>($"{_contextName}.{_collectionName}", _prefilters,
                 new OrderByPrefilter<T>(property, direction));
+        }
+
+        /// <summary>
+        /// Only query specific data defined by selector
+        /// </summary>
+        /// <param name="properties">The properties of the model to select</param>
+        public ReducedCollection<T, object[]> Select(params string[] properties)
+        {
+            return _collectionManager.GetCollection<T, object[]>($"{_contextName}.{_collectionName}", _prefilters,
+                new SelectPrefilter<T>(properties));
+        }
+        
+        /// <summary>
+        /// Specify the navigation properties to explicitly load from database
+        /// </summary>
+        /// <param name="include">The navigation property string (use EF Core Syntax)</param>
+        public DefaultCollection<T> Include(string include)
+        {
+            return _collectionManager.GetCollection<T, List<T>>($"{_contextName}.{_collectionName}", _prefilters,
+                new IncludePrefilter<T>(include));
+        }
+        
+        /// <summary>
+        /// Get the number of elements in the collection
+        /// </summary>
+        public ReducedCollection<T, int> Count()
+        {
+            return _collectionManager.GetCollection<T, int>($"{_contextName}.{_collectionName}", _prefilters,
+                new CountPrefilter<T>());
+        }
+        
+        /// <summary>
+        /// Get the first element of the collection. Returns null if nothing was found.
+        /// </summary>
+        public ReducedCollection<T, T> First()
+        {
+            return _collectionManager.GetCollection<T, T>($"{_contextName}.{_collectionName}", _prefilters,
+                new FirstPrefilter<T>());
+        }
+        
+        /// <summary>
+        /// Get the last element of the collection. Returns null if nothing was found.
+        /// </summary>
+        public ReducedCollection<T, T> Last()
+        {
+            return _collectionManager.GetCollection<T, T>($"{_contextName}.{_collectionName}", _prefilters,
+                new LastPrefilter<T>());
         }
     }
 }

@@ -11,7 +11,7 @@ namespace SapphireDb_Net.Collection.Prefilter
             PrefilterType = GetType().Name.Split("`")[0];
         }
 
-        public abstract TOutput Execute(List<TInput> values);
+        public abstract TOutput Execute(IEnumerable<TInput> values);
 
         public abstract string Hash();
     }
