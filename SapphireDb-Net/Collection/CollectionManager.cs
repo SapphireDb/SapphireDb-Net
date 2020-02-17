@@ -34,10 +34,11 @@ namespace SapphireDb_Net.Collection
 
             // }
 
-            // if (newPrefilter is OrderByPrefilter)
-            // {
-
-            // }
+            if (newPrefilter is OrderByPrefilter<T>)
+            {
+                return new OrderedCollection<T>(collectionNameRaw, _connectionManager, this, newPrefilters,
+                    _collectionInformationManager.GetCollectionInformation(collectionNameRaw));
+            }
 
             return new DefaultCollection<T>(collectionNameRaw, _connectionManager, this, newPrefilters,
                 _collectionInformationManager.GetCollectionInformation(collectionNameRaw));

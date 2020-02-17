@@ -193,7 +193,17 @@ namespace SapphireDb_Net.Collection
         private IObservable<TValue> CreateCollectionObservable(CollectionValue collectionValue)
         {
             return collectionValue.Subject
-                .Select((values) => (TValue) values)
+                .Select((values) =>
+                {
+                    dynamic result = values;
+                    
+                    foreach (dynamic prefilter in _prefilters.Where(p => !(p is IAfterQueryPrefilter)))
+                    {
+                        result = prefilter.Execute(result);
+                    }
+                    
+                    return (TValue)(object)(new List<TModel>(result));
+                })
                 .Finally(() =>
                 {
                     _connectionManager.SendCommand(new UnsubscribeCommand(_collectionName, _contextName,

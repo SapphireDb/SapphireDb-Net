@@ -25,9 +25,10 @@ namespace SapphireDbNetDemo
             };
             SapphireDb db = new SapphireDb(options);
 
-            DefaultCollection<object> collection = db.Collection<object>("demo.entries");
+            DefaultCollection<Entry> collection = db.Collection<Entry>("demo.entries");
 
-            IObservable<List<object>> values = collection.Where(new object[] { "content", "==", "xyc" }).Values();
+            // IObservable<List<object>> values = collection.Where(new object[] { "content", "==", "xyc" }).Values();
+            IObservable<List<Entry>> values = collection.OrderBy("content", SortDirection.Descending).Values();
             
             values.Subscribe((value) =>
             {

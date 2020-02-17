@@ -44,5 +44,17 @@ namespace SapphireDb_Net.Collection
             return _collectionManager.GetCollection<T>($"{_contextName}.{_collectionName}", _prefilters,
                 new WherePrefilter<T>(conditions));
         }
+        
+        /// <summary>
+        /// Apply ordering to the collection
+        /// </summary>
+        /// <param name="property">The name of the property to order by</param>
+        /// <param name="direction">The direction of ordering</param>
+        /// <returns></returns>
+        public OrderedCollection<T> OrderBy(string property, SortDirection direction = SortDirection.Ascending)
+        {
+            return _collectionManager.GetCollection<T>($"{_contextName}.{_collectionName}", _prefilters,
+                new OrderByPrefilter<T>(property, direction));
+        }
     }
 }
