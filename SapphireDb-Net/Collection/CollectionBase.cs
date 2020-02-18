@@ -96,7 +96,7 @@ namespace SapphireDb_Net.Collection
         /// Add a value to the collection
         /// </summary>
         /// <param name="values">The object(s) to add to the collection</param>
-        public IObservable<CommandResult<TModel>> Add(params TModel[] values)
+        public IObservable<CommandResults<TModel>> Add(params TModel[] values)
         {
             CommandBase command;
             
@@ -116,7 +116,7 @@ namespace SapphireDb_Net.Collection
         /// Update a value of the collection
         /// </summary>
         /// <param name="values">The object(s) to update in the collection</param>
-        public IObservable<CommandResult<TModel>> Update(params TModel[] values)
+        public IObservable<CommandResults<TModel>> Update(params TModel[] values)
         {
             CommandBase command;
             
@@ -136,7 +136,7 @@ namespace SapphireDb_Net.Collection
         /// Remove a value from the collection
         /// </summary>
         /// <param name="values">The object(s) to remove from the collection</param>
-        public IObservable<CommandResult<TModel>> Remove(params TModel[] values)
+        public IObservable<CommandResults<TModel>> Remove(params TModel[] values)
         {
             CommandBase command;
             
@@ -219,24 +219,42 @@ namespace SapphireDb_Net.Collection
                 .RefCount();
         }
 
-        private IObservable<CommandResult<TModel>> CreateCommandResult(IObservable<ResponseBase> observable)
+        private IObservable<CommandResults<TModel>> CreateCommandResult(IObservable<ResponseBase> observable)
         {
             return observable
                 .Select(response =>
                 {
-                    if (response is CreateResponse createResponse)
-                    {
-                        return new CommandResult<TModel>(createResponse.Error, createResponse.ValidationResults, createResponse.NewObject.ToObject<TModel>());
-                    }
-
-                    if (response is UpdateResponse updateResponse)
-                    {
-                        return new CommandResult<TModel>(updateResponse.Error, updateResponse.ValidationResults, updateResponse.UpdatedObject.ToObject<TModel>());
-                    }
+                    List<CommandResult<TModel>> results;
                     
-                    // TODO: Handle Update, UpdateRange and CreateRange
+                    if (response is CreateResponse || response is UpdateResponse || response is DeleteResponse)
+                    {
+                        results = new List<CommandResult<TModel>>()
+                        {
+                            new CommandResult<TModel>((ValidatedResponseBase)response)
+                        };
+                    }
+                    else
+                    {
+                        IEnumerable<ValidatedResponseBase> responses = new List<ValidatedResponseBase>();
 
-                    return null;
+                        if (response is CreateRangeResponse createRangeResponse)
+                        {
+                            responses = createRangeResponse.Results;
+                        }
+                        else if (response is UpdateRangeResponse updateRangeResponse)
+                        {
+                            responses = updateRangeResponse.Results;
+                        }
+                        else if (response is DeleteRangeResponse deleteRangeResponse)
+                        {
+                            responses = deleteRangeResponse.Results;
+                        }
+                        
+                        results = responses.Select(r => new CommandResult<TModel>(r)).ToList();
+
+                    }
+
+                    return new CommandResults<TModel>(results);
                 });
         }
     }

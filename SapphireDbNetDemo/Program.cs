@@ -27,18 +27,19 @@ namespace SapphireDbNetDemo
 
             DefaultCollection<Entry> collection = db.Collection<Entry>("demo.entries");
             //
+            IObservable<List<Entry>> values = collection.Values();
             // IObservable<List<Entry>> values = collection.Where(new object[] { "content", "==", "xyc" }).Values();
             // IObservable<List<Entry>> values = collection.OrderBy("content", SortDirection.Descending).ThenOrderBy("integerValue").Values();
-            
-            // values.Subscribe((value) =>
-            // {
-            //     
-            // });
 
-            // collection.Add(new {content = "Das ist ein test"}, new { content = "Das ist test 2" }).Subscribe((r) =>
-            // {
-            //     
-            // });
+            values.Subscribe((value) =>
+            {
+                
+            });
+
+            collection.Add(new Entry() { Content = "Test 123"}, new Entry() { Content = "Test 2345"}).Subscribe((r) =>
+            {
+                
+            });
 
 
             // DefaultCollection<User> userCollection = db.Collection<User>("demo.users").Include("entries");
@@ -48,10 +49,10 @@ namespace SapphireDbNetDemo
             //     
             // });
 
-            collection.Select("content").Values().Subscribe(v =>
-            {
-                
-            });
+            // collection.Select("content").Values().Subscribe(v =>
+            // {
+            //     
+            // });
             
             Console.ReadKey();
         }

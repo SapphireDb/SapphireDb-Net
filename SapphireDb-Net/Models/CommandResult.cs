@@ -1,5 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using SapphireDb_Net.Command;
+using SapphireDb_Net.Command.Create;
+using SapphireDb_Net.Command.Update;
 
 namespace SapphireDb_Net.Models
 {
@@ -11,11 +15,19 @@ namespace SapphireDb_Net.Models
 
         public T Value { get; set; }
 
-        public CommandResult(object error, Dictionary<string, string[]> validationResults, T value)
+        public CommandResult(ValidatedResponseBase response)
         {
-            Error = error;
-            ValidationResults = validationResults;
-            Value = value;
+            Error = response.Error;
+            ValidationResults = response.ValidationResults;
+
+            if (response is CreateResponse createResponse)
+            {
+                Value = createResponse.NewObject.ToObject<T>();
+            }
+            else if (response is UpdateResponse updateResponse)
+            {
+                Value = updateResponse.UpdatedObject.ToObject<T>();
+            }
         }
 
         public bool HasSuccess()

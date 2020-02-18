@@ -53,7 +53,6 @@ namespace SapphireDb_Net.Connection
                                 {
                                     MessageHandler(response);
                                 }
-                                Console.WriteLine(message);
                             });
 
                             await _websocketClient.Start();
